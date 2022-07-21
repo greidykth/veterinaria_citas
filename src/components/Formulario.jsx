@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Alert from "./Alert";
 
-const Formulario = ({pacientes, setPacientes}) => {
+const Formulario = ({pacientes, setPacientes, paciente, setPaciente}) => {
   const [nombre, setNombre] = useState("");
   const [propietario, setPropietario] = useState("");
   const [email, setEmail] = useState("");
@@ -9,6 +9,15 @@ const Formulario = ({pacientes, setPacientes}) => {
   const [sintomas, setSintomas] = useState("");
   const [alert, setAlert] = useState("");
 
+    useEffect ( () => {
+        if(Object.keys(paciente).length > 0) {
+            setNombre(paciente.nombre);
+            setPropietario(paciente.propietario);
+            setEmail(paciente.email);
+            setFecha(paciente.fecha);
+            setSintomas(paciente.sintomas);
+        }
+    }, [paciente])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,7 +28,6 @@ const Formulario = ({pacientes, setPacientes}) => {
     }
 
     const objetoPaciente = {
-        id: generarId(),
         nombre,
         propietario,
         email,
@@ -27,11 +35,24 @@ const Formulario = ({pacientes, setPacientes}) => {
         sintomas
     }
 
-    setPacientes([...pacientes, objetoPaciente]);
-    setAlert('success');
-    setTimeout(() => {
-        setAlert('');
-    }, 2000);
+    if(paciente.id){
+        objetoPaciente.id = paciente.id;
+        const pacientesActualizados = pacientes.map((pacienteState) => pacienteState.id === paciente.id ? objetoPaciente : pacienteState);
+        setPacientes(pacientesActualizados);
+        setPaciente({});
+        setAlert('success');
+        setTimeout(() => {
+            setAlert('');
+        }, 2000);
+        
+    } else {
+        objetoPaciente.id = generarId();
+        setPacientes([...pacientes, objetoPaciente]);
+        setAlert('success');
+        setTimeout(() => {
+            setAlert('');
+        }, 2000);
+    }
 
     setNombre('');
     setPropietario('');
